@@ -46,5 +46,5 @@ if __name__ == '__main__':
     # data modelling
     data = get_data_object(X, df)
     # modelling
-    perform_modelling(data, df, 'name')
+    perform_modelling(data, df, 'chained')
 

@@ -14,10 +14,14 @@ def get_input_data():
     df[Config.TICKET_SUMMARY] = df[Config.TICKET_SUMMARY].fillna("")
     return df
 
-def remove_duplicates(df):
+def de_duplication(df):
     return df.drop_duplicates()
 
-def to_lower(df):
+def noise_remover(df):
     df[Config.INTERACTION_CONTENT] = df[Config.INTERACTION_CONTENT].str.lower()
     df[Config.TICKET_SUMMARY] = df[Config.TICKET_SUMMARY].str.lower()
     return df
+
+def translate_to_en(text_list):
+    # Stub for translation simulating language conversion
+    return text_list
