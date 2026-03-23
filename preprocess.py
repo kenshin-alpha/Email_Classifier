@@ -13,3 +13,11 @@ def get_input_data():
     df[Config.INTERACTION_CONTENT] = df[Config.INTERACTION_CONTENT].fillna("")
     df[Config.TICKET_SUMMARY] = df[Config.TICKET_SUMMARY].fillna("")
     return df
+
+def remove_duplicates(df):
+    return df.drop_duplicates()
+
+def to_lower(df):
+    df[Config.INTERACTION_CONTENT] = df[Config.INTERACTION_CONTENT].str.lower()
+    df[Config.TICKET_SUMMARY] = df[Config.TICKET_SUMMARY].str.lower()
+    return df
