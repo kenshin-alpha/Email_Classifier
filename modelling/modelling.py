@@ -21,6 +21,14 @@ def model_predict(data, df, name):
         model_y2.predict(data.X_test)
         preds_y2 = model_y2.predictions
         
+        # Encode for next stage
+        le_y2 = LabelEncoder()
+        y2_enc_train = le_y2.fit_transform(y2_train)
+        preds_y2_enc = encode_safe(le_y2, preds_y2)
+        
+        # 2. Model for y3
+        X_train_y3 = concat_features(data.X_train, y2_enc_train)
+        X_test_y3 = concat_features(data.X_test, preds_y2_enc)
         
         return {
             "name": "chained",
