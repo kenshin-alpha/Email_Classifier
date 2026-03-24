@@ -11,6 +11,7 @@ def model_predict(data, df, name):
     # Here we need to call the methods related to the model e.g., random forest 
     if name == 'chained':
         y2_train = data.y_train[Config.TYPE_COLS[0]]
+        y3_train = data.y_train[Config.TYPE_COLS[1]]
         
         # Modelling for y2
         model_y2 = RandomForest("y2", data.embeddings, y2_train)
@@ -30,12 +31,21 @@ def model_predict(data, df, name):
         X_train_y3 = concat_features(data.X_train, y2_enc_train)
         X_test_y3 = concat_features(data.X_test, preds_y2_enc)
         
+        model_y3 = RandomForest("y3", data.embeddings, y3_train)
+        d_y3 = Data(X=data.embeddings, df=data.df, X_train=X_train_y3, X_test=X_test_y3,
+                    y_train=y3_train, y_test=data.y_test[Config.TYPE_COLS[1]],
+                    train_df=data.train_df, test_df=data.test_df)
+        model_y3.train(d_y3)
+        model_y3.predict(X_test_y3)
+        preds_y3 = model_y3.predictions
+
         return {
             "name": "chained",
-            "models": [model_y2],
+            "models": [model_y2, model_y3],
             "predictions": pd.DataFrame({
-                Config.TYPE_COLS[0]: preds_y2
-              })
+                Config.TYPE_COLS[0]: preds_y2,
+                Config.TYPE_COLS[1]: preds_y3
+            })
         }
     return None
 
