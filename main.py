@@ -31,7 +31,9 @@ def get_data_object(X: np.ndarray, df: pd.DataFrame):
     return Data(X, df)
 
 def perform_modelling(data: Data, df: pd.DataFrame, name):
-    model_predict(data, df, name)
+    model = model_predict(data, df, name)
+    if model is not None:
+        model_evaluate(model, data)
 # Code will start executing from following line
 if __name__ == '__main__':
     

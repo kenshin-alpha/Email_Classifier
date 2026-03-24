@@ -5,7 +5,8 @@ from sklearn.preprocessing import LabelEncoder
 from utils import concat_features, encode_safe
 import pandas as pd
 import numpy as np
-
+from sklearn.metrics import classification_report
+    
 
 def model_predict(data, df, name):
     # Here we need to call the methods related to the model e.g., random forest 
@@ -71,4 +72,11 @@ def model_predict(data, df, name):
 
 
 def model_evaluate(model, data):
-    model.print_results(data)
+    if isinstance(model, dict):
+        print(f"\n=== {model['name'].capitalize()} Model Evaluation ===")
+        preds = model["predictions"]
+        for col in Config.TYPE_COLS:
+            print(f"\nClassification Report for {col}:")
+            y_true = data.y_test[col]
+            y_pred = preds[col]
+            print(classification_report(y_true, y_pred, zero_division=0))
