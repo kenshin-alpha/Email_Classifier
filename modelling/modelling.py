@@ -67,6 +67,39 @@ def model_predict(data, df, name):
                 Config.TYPE_COLS[2]: preds_y4
             })
         }
+    elif name == 'hierarchical':
+        print("\nExecuting Hierarchical Architecture...")
+        y2_train = data.y_train[Config.TYPE_COLS[0]]
+        model_y2 = RandomForest("y2_top", data.embeddings, y2_train)
+        d_y2 = Data(X=data.embeddings, df=data.df, X_train=data.X_train, X_test=data.X_test, 
+                    y_train=y2_train, y_test=data.y_test[Config.TYPE_COLS[0]],
+                    train_df=data.train_df, test_df=data.test_df)
+        model_y2.train(d_y2)
+        model_y2.predict(data.X_test)
+        preds_y2 = model_y2.predictions
+        
+        models_y3 = {}
+        for c in y2_train.unique():
+            if pd.isna(c): continue
+            mask = y2_train == c
+            X_train_sub = data.X_train.tocsr()[mask.values] if hasattr(data.X_train, "tocsr") else data.X_train[mask.values]
+            y3_train_sub = data.y_train.loc[mask, Config.TYPE_COLS[1]]
+            
+            if len(y3_train_sub) > 0:
+                m3 = RandomForest(f"y3_{c}", data.embeddings, y3_train_sub)
+                d3 = Data(X=None, df=None, X_train=X_train_sub, X_test=data.X_test,
+                          y_train=y3_train_sub, y_test=None, train_df=None, test_df=None)
+                m3.train(d3)
+                models_y3[c] = m3
+                
+            
+        return {
+            "name": "hierarchical",
+            "models": [model_y2],
+            "predictions": pd.DataFrame({
+                Config.TYPE_COLS[0]: preds_y2
+            })
+
     return None
 
 
