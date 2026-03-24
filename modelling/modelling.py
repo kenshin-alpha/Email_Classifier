@@ -39,6 +39,14 @@ def model_predict(data, df, name):
         model_y3.predict(X_test_y3)
         preds_y3 = model_y3.predictions
 
+         # Encode for next stage
+        le_y3 = LabelEncoder()
+        y3_enc_train = le_y3.fit_transform(y3_train)
+        preds_y3_enc = encode_safe(le_y3, preds_y3)
+        
+        X_train_y4 = concat_features(X_train_y3, y3_enc_train)
+        X_test_y4 = concat_features(X_test_y3, preds_y3_enc)
+
         return {
             "name": "chained",
             "models": [model_y2, model_y3],
