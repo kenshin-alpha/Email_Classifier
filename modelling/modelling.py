@@ -92,14 +92,51 @@ def model_predict(data, df, name):
                 m3.train(d3)
                 models_y3[c] = m3
                 
+        y3_train = data.y_train[Config.TYPE_COLS[1]]
+        models_y4 = {}
+        for c in y3_train.unique():
+            if pd.isna(c): continue
+            mask = y3_train == c
+            X_train_sub = data.X_train.tocsr()[mask.values] if hasattr(data.X_train, "tocsr") else data.X_train[mask.values]
+            y4_train_sub = data.y_train.loc[mask, Config.TYPE_COLS[2]]
+            
+            if len(y4_train_sub) > 0:
+                m4 = RandomForest(f"y4_{c}", data.embeddings, y4_train_sub)
+                d4 = Data(X=None, df=None, X_train=X_train_sub, X_test=data.X_test,
+                          y_train=y4_train_sub, y_test=None, train_df=None, test_df=None)
+                m4.train(d4)
+                models_y4[c] = m4
+                
+        preds_y3 = []
+        preds_y4 = []
+        for i in range(data.X_test.shape[0]):
+            x_inst = data.X_test[i]
+            if hasattr(x_inst, "shape") and len(x_inst.shape) == 1:
+                x_inst = x_inst.reshape(1, -1)
+                
+            p2 = preds_y2[i]
+            
+            p3 = "Unknown/Other"
+            if p2 in models_y3:
+                models_y3[p2].predict(x_inst)
+                p3 = models_y3[p2].predictions[0]
+            preds_y3.append(p3)
+            
+            p4 = "Unknown/Other"
+            if p3 in models_y4:
+                models_y4[p3].predict(x_inst)
+                p4 = models_y4[p3].predictions[0]
+            preds_y4.append(p4)
             
         return {
             "name": "hierarchical",
-            "models": [model_y2],
+            "models": [model_y2, models_y3, models_y4],
             "predictions": pd.DataFrame({
-                Config.TYPE_COLS[0]: preds_y2
+                Config.TYPE_COLS[0]: preds_y2,
+                Config.TYPE_COLS[1]: preds_y3,
+                Config.TYPE_COLS[2]: preds_y4
             })
-
+        }
     return None
 
 

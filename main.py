@@ -49,4 +49,5 @@ if __name__ == '__main__':
     data = get_data_object(X, df)
     # modelling
     perform_modelling(data, df, 'chained')
+    perform_modelling(data, df, 'hierarchical')
 
