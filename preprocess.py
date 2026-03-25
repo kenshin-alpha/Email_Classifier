@@ -9,6 +9,8 @@ def get_input_data():
     df1 = pd.read_csv(os.path.join(base_dir, "data/AppGallery.csv"))
     df2 = pd.read_csv(os.path.join(base_dir, "data/Purchasing.csv"))
     df = pd.concat([df1, df2], ignore_index=True)
+    if "Type 1" in df.columns:
+        df = df.drop(columns=["Type 1"])
     df = df.dropna(subset=Config.TYPE_COLS)
     df[Config.INTERACTION_CONTENT] = df[Config.INTERACTION_CONTENT].fillna("")
     df[Config.TICKET_SUMMARY] = df[Config.TICKET_SUMMARY].fillna("")

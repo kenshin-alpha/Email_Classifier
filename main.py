@@ -33,7 +33,8 @@ def get_data_object(X: np.ndarray, df: pd.DataFrame):
 def perform_modelling(data: Data, df: pd.DataFrame, name):
     model = model_predict(data, df, name)
     if model is not None:
-        model_evaluate(model, data)
+        return model_evaluate(model, data)
+    return None
 # Code will start executing from following line
 if __name__ == '__main__':
     
@@ -48,6 +49,14 @@ if __name__ == '__main__':
     # data modelling
     data = get_data_object(X, df)
     # modelling
-    perform_modelling(data, df, 'chained')
-    perform_modelling(data, df, 'hierarchical')
+    print("\nStarting Assessment Validation Pipeline...")
+    res_chained = perform_modelling(data, df, 'chained')
+    res_hierarchical = perform_modelling(data, df, 'hierarchical')
+    
+    print("\n============= FINAL ARCHITECTURE COMPARISON ==============")
+    if res_chained and res_hierarchical:
+        print(f"Design 1 (Chained Multi-Output) Final Sequential Accuracy: {res_chained.get('Type 4', 0):.2%}")
+        print(f"Design 2 (Hierarchical Filter) Final Sequential Accuracy: {res_hierarchical.get('Type 4', 0):.2%}")
+        winner = "Design 1 (Chained)" if res_chained.get('Type 4', 0) >= res_hierarchical.get('Type 4', 0) else "Design 2 (Hierarchical)"
+        print(f"Optimal Design Decision for Full CA Scenario: {winner}")
 
