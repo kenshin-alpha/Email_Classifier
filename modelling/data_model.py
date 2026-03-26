@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from scipy.sparse import issparse, hstack
 from Config import *
 from utils import *
 import random
@@ -10,7 +11,7 @@ np.random.seed(seed)
 
 class Data():
     def __init__(self,
-                 X: np.ndarray,
+                 X: np.ndarray = None,
                  df: pd.DataFrame = None,
                  X_train=None, X_test=None, y_train=None, y_test=None,
                  train_df=None, test_df=None) -> None:
@@ -25,21 +26,6 @@ class Data():
             self.df = df
             self.y = y_train if y_train is not None else None
         else:
-            # Handling Low Frequency Classes
-            min_instances = 5
-            mask = np.ones(df.shape[0], dtype=bool)
-            for col in Config.TYPE_COLS:
-                if col in df.columns:
-                    counts = df[col].value_counts()
-                    valid_classes = counts[counts >= min_instances].index
-                    mask &= df[col].isin(valid_classes).values
-                    
-            df = df[mask].reset_index(drop=True)
-            if hasattr(X, "tocsr"):
-                X = X.tocsr()[mask]
-            else:
-                X = X[mask]
-                
             self.embeddings = X
             self.df = df
             self.y = df[Config.TYPE_COLS]
